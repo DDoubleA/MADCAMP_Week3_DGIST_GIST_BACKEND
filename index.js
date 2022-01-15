@@ -36,7 +36,6 @@ const UserSchema = new Schema({
             학점    : Number,
             비고    :String
         }]
-    
 })
 
 const user = mongoose.model('users',UserSchema);
@@ -44,14 +43,16 @@ const user = mongoose.model('users',UserSchema);
 app.use('/dgist', dgist)
 app.use('/users', users)
 app.get('/', function(req, res) {
-    console.log("hello")
+    // console.log("hello")
 })
 
 //제출하기
 app.post('/user', function(req, res) {
-    let userId = req.body.userid
-    let taken = req.body.isheard
-    console.log(userId);
+    // console.log("dasssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+    let userId = req.body.userid.userId
+    let taken = req.body.taken.isheard
+    // console.log(userId);
+    // console.log(taken);
     user.findOne({UserID: userId}).then((doc) =>{
         if(doc == null) { //save
             const newuser = new user({
@@ -60,16 +61,17 @@ app.post('/user', function(req, res) {
             })
             newuser.save().then(() => console.log('Saved successfully'));
         } else {// edit
-            user.updateOne({_id: doc._id}, {$set : {taken: taken}}).then(console.log('updated'))
+            user.updateOne({_id: doc._id}, {$push : {taken: taken}}).then(console.log('updated'))
         }
     })
    
 })
 //courses 정보 요청 
 app.get('/user/:id', function(req, res){
-    console.log("here")
+    // console.log("here")
     // console.log(req.params.id)
     let id = req.params.id
+
     user.findOne({'UserID':id}).then((result=> {
         console.log(result.UserID)
         res.json(result.taken)
@@ -80,11 +82,42 @@ app.get('/user/:id', function(req, res){
 //로그인 요청
 app.post('/login', function(req,res) {
     console.log("login post", req.body)
+    let userId =req.body.id
+    let PassWord = req.body.pw 
+    user.findOne({UserID: userId}).then((doc) =>{
+        if(doc == null) { //save
+            res.send(`There is no registered ID`)
+        } else {// edit
+            // console.log(`doc.PassWord`, doc.PassWord)
+            // console.log(`PassWord`, PassWord)
+            if (doc.PassWord == PassWord){
+                res.send(`correct`)
+            }
+            else{
+                res.send(`Wrong Password`)
+            }
+        }
+    })
+
     // console.log(req.body.pw)
 })
 //회원가입 요청
 app.post('/register', function(req,res){
     console.log("register post ", req.body)
+    let userId = req.body.id
+    let PassWord = req.body.pw 
+    user.findOne({UserID: userId}).then((doc) =>{
+        if(doc == null) { //save
+            const newuser = new user({
+                UserID : userId,
+                PassWord : PassWord
+            })
+            newuser.save().then(() => console.log('Saved successfully'));
+            res.send(`registered successfully`)
+        } else {// edit
+            res.send(`duplicated ID`)
+        }
+    })
 
 })
 
