@@ -85,12 +85,12 @@ app.post('/login', function(req,res) {
         if(doc == null) { //DB에 user 정복 없을 때 로그인 불가
             res.send(`There is no registered ID`)
         } else {
-            if(doc.taken.length == 0){ // taken Course 정보가 없으면 Survey로
-                res.send(`correct`) // new user
-            }
-            else if (doc.PassWord == PassWord){// taken Course 정보가 있고 db password와 일치하면 로그인
+            if (doc.PassWord === PassWord){// taken Course 정보가 있고 db password와 일치하면 로그인
                 // res.send(`courses`) // 기존 이동
-                if(doc.School === "dgist"){
+                if(doc.taken.length == 0){ // taken Course 정보가 없으면 Survey로
+                    res.send(`correct`) // new user
+                }
+                else if(doc.School === "dgist"){
                     res.send(`dgist`)
                 }
                 else if(doc.School === "gist"){
@@ -98,7 +98,7 @@ app.post('/login', function(req,res) {
                 }
                 else( // 기존 학교 없을 때 가입한 유저?
                     res.send(`courses`)
-                )
+                ) 
             }
             else{ // 틀리면 로그인 불가
                 res.send(`Wrong Password`)
